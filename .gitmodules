@@ -1,0 +1,6 @@
+[submodule "AndEngine"]
+	path = AndEngine
+	url = git://github.com/nicolasgramlich/AndEngine.git
+[submodule "AndEngineLiveWallpaperExtension"]
+	path = AndEngineLiveWallpaperExtension
+	url = git://github.com/nicolasgramlich/AndEngineLiveWallpaperExtension.git
