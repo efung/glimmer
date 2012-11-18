@@ -25,7 +25,7 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements ITi
     private static final int CAMERA_WIDTH = 480;
     private static final int CAMERA_HEIGHT = 800;
 
-    private static final float DURATION = 10.0f;
+    private static final float PARTICLE_LIFETIME = 10.0f;
 
     private Camera mCamera;
     private BitmapTextureAtlas mBitmapTextureAtlas;
@@ -33,6 +33,7 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements ITi
     private BatchedSpriteParticleSystem mParticleSystem;
 
     private float mCurrentR, mCurrentG, mCurrentB;
+    private float hsv[] = new float[3];
     private ColorParticleInitializer<UncoloredSprite> mColorParticleInitializer;
 
     @Override
@@ -57,12 +58,12 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements ITi
     @Override
     public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback) throws Exception
     {
-        this.mEngine.registerUpdateHandler(new TimerHandler(3.0f, true, this));
+        this.mEngine.registerUpdateHandler(new TimerHandler(PARTICLE_LIFETIME, true, this));
         final Scene scene = new Scene();
 
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT, 16, 16);
         final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles * 0.25f, maxParticles * 0.25f, maxParticles,
+        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles * 0.20f, maxParticles * 0.20f, maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
         this.mCurrentR = MathUtils.RANDOM.nextFloat();
@@ -70,10 +71,11 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements ITi
         this.mCurrentB = MathUtils.RANDOM.nextFloat();
         this.mColorParticleInitializer = new ColorParticleInitializer<UncoloredSprite>(this.mCurrentR, this.mCurrentG, this.mCurrentB);
         this.mParticleSystem.addParticleInitializer(this.mColorParticleInitializer);
-        this.mParticleSystem.addParticleInitializer(new ExpireParticleInitializer<UncoloredSprite>(DURATION));
+        this.mParticleSystem.addParticleInitializer(new ExpireParticleInitializer<UncoloredSprite>(PARTICLE_LIFETIME));
 
-        this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(0, DURATION / 2, 0, 1));
-        this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(DURATION / 2, DURATION, 1, 0));
+        this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(0, PARTICLE_LIFETIME / 2, 0f, 1f));
+        this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(PARTICLE_LIFETIME / 2,
+                PARTICLE_LIFETIME, 1f, 0f));
 
         scene.attachChild(this.mParticleSystem);
 
@@ -89,9 +91,21 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements ITi
     @Override
     public void onTimePassed(TimerHandler pTimerHandler)
     {
-        this.mCurrentR = MathUtils.RANDOM.nextFloat();
-        this.mCurrentG = MathUtils.RANDOM.nextFloat();
-        this.mCurrentB = MathUtils.RANDOM.nextFloat();
+        int r = Math.round(this.mCurrentR * 255f);
+        int g = Math.round(this.mCurrentG * 255f);
+        int b = Math.round(this.mCurrentB * 255f);
+        android.graphics.Color.RGBToHSV(r, g, b, hsv);
+
+        // Perturb values by hue, avoiding overly dark or bright colours
+        hsv[0] = MathUtils.bringToBounds(0.0f, 360.f, hsv[0] + MathUtils.randomSign() * 20.0f);
+        hsv[1] = MathUtils.bringToBounds(0.3f, 0.7f, hsv[1] + MathUtils.randomSign() * 0.1f);
+        hsv[2] = MathUtils.bringToBounds(0.3f, 0.7f, hsv[2] + MathUtils.randomSign() * 0.1f);
+        int packedARGB = android.graphics.Color.HSVToColor(hsv);
+
+        this.mCurrentR = android.graphics.Color.red(packedARGB) / 255f;
+        this.mCurrentG = android.graphics.Color.green(packedARGB) / 255f;
+        this.mCurrentB = android.graphics.Color.blue(packedARGB) / 255f;
+
         ColorParticleInitializer<UncoloredSprite> initializer = new ColorParticleInitializer<UncoloredSprite>(this.mCurrentR, this.mCurrentG, this.mCurrentB);
 
         this.mParticleSystem.addParticleInitializer(initializer);
