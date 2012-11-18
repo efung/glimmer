@@ -72,15 +72,6 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements ITi
         this.mParticleSystem.addParticleInitializer(this.mColorParticleInitializer);
         this.mParticleSystem.addParticleInitializer(new ExpireParticleInitializer<UncoloredSprite>(DURATION));
 
-        float hsv[] = new float[3];
-        hsv[0] = MathUtils.RANDOM.nextFloat() * 360f;
-        hsv[1] = 0.5f;
-        hsv[2] = 0.5f;
-//            int packedARGB1 = android.graphics.Color.HSVToColor(hsv);
-//            int r1 = android.graphics.Color.red(packedARGB1);
-//            int g1 = android.graphics.Color.green(packedARGB1);
-//            int b1 = android.graphics.Color.blue(packedARGB1);
-
         this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(0, DURATION / 2, 0, 1));
         this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(DURATION / 2, DURATION, 1, 0));
 
