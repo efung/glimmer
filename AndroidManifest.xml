@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.github.efung.nexus4wp">
+    <uses-sdk android:minSdkVersion="8"/>
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+        <service
+                android:name="Nexus4LiveWallpaper"
+                android:enabled="true"
+                android:icon="@drawable/icon"
+                android:label="Nexus 4 Wallpaper"
+                android:permission="android.permission.BIND_WALLPAPER">
+            <intent-filter android:priority="1">
+                <action android:name="android.service.wallpaper.WallpaperService" />
+            </intent-filter>
+            <meta-data
+                    android:name="android.service.wallpaper"
+                    android:resource="@xml/wallpaper" />
+        </service>
+    </application>
+
+    <uses-feature
+            android:name="android.software.live_wallpaper"
+            android:required="true">
+    </uses-feature>
+</manifest>
