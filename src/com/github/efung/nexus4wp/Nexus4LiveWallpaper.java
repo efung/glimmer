@@ -8,6 +8,7 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 import org.andengine.entity.particle.BatchedSpriteParticleSystem;
 import org.andengine.entity.particle.initializer.ColorParticleInitializer;
+import org.andengine.entity.particle.initializer.RotationParticleInitializer;
 import org.andengine.entity.particle.modifier.AlphaParticleModifier;
 import org.andengine.entity.particle.modifier.ExpireParticleInitializer;
 import org.andengine.entity.scene.Scene;
@@ -25,7 +26,7 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements ITi
     private static final int CAMERA_WIDTH = 480;
     private static final int CAMERA_HEIGHT = 800;
 
-    private static final float PARTICLE_LIFETIME = 10.0f;
+    private static final float PARTICLE_LIFETIME = 6.0f;
 
     private Camera mCamera;
     private BitmapTextureAtlas mBitmapTextureAtlas;
@@ -49,8 +50,8 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements ITi
             Exception
     {
         BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
-        this.mBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 22, 22, BitmapTextureFormat.RGB_565, TextureOptions.BILINEAR);
-        this.mParticleTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "particle.png", 0, 0);
+        this.mBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 32, 32, BitmapTextureFormat.RGB_565, TextureOptions.BILINEAR);
+        this.mParticleTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, "nexusdot.png", 0, 0);
         this.mBitmapTextureAtlas.load();
         pOnCreateResourcesCallback.onCreateResourcesFinished();
     }
@@ -58,12 +59,14 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements ITi
     @Override
     public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback) throws Exception
     {
-        this.mEngine.registerUpdateHandler(new TimerHandler(PARTICLE_LIFETIME, true, this));
+        this.mEngine.registerUpdateHandler(new TimerHandler(PARTICLE_LIFETIME * 0.8f, true, this));
+
         final Scene scene = new Scene();
 
-        final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT, 16, 16);
+        final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
+                this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight());
         final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles * 0.20f, maxParticles * 0.20f, maxParticles,
+        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / (2f*PARTICLE_LIFETIME), maxParticles / PARTICLE_LIFETIME, maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
         this.mCurrentR = MathUtils.RANDOM.nextFloat();
@@ -71,6 +74,7 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements ITi
         this.mCurrentB = MathUtils.RANDOM.nextFloat();
         this.mColorParticleInitializer = new ColorParticleInitializer<UncoloredSprite>(this.mCurrentR, this.mCurrentG, this.mCurrentB);
         this.mParticleSystem.addParticleInitializer(this.mColorParticleInitializer);
+        this.mParticleSystem.addParticleInitializer(new RotationParticleInitializer<UncoloredSprite>(-90f, 90f));
         this.mParticleSystem.addParticleInitializer(new ExpireParticleInitializer<UncoloredSprite>(PARTICLE_LIFETIME));
 
         this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(0, PARTICLE_LIFETIME / 2, 0f, 1f));
@@ -97,7 +101,13 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements ITi
         android.graphics.Color.RGBToHSV(r, g, b, hsv);
 
         // Perturb values by hue, avoiding overly dark or bright colours
-        hsv[0] = MathUtils.bringToBounds(0.0f, 360.f, hsv[0] + MathUtils.randomSign() * 20.0f);
+        hsv[0] += MathUtils.randomSign() * (MathUtils.RANDOM.nextFloat() * 20.0f + 10.0f); // between 10 and 30 degrees
+        if (hsv[0] > 360f) {
+            hsv[0] -= 360f;
+        }
+        else if (hsv[0] < 0f) {
+            hsv[0] += 360f;
+        }
         hsv[1] = MathUtils.bringToBounds(0.3f, 0.7f, hsv[1] + MathUtils.randomSign() * 0.1f);
         hsv[2] = MathUtils.bringToBounds(0.3f, 0.7f, hsv[2] + MathUtils.randomSign() * 0.1f);
         int packedARGB = android.graphics.Color.HSVToColor(hsv);
