@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://github.com/efung/seekbar"
+    android:key="preference_screen">
+
+    <PreferenceCategory android:title="General">
+        <com.github.efung.nexus4wp.SeekBarPreference
+            android:key="@string/prefs_key_particle_lifetime"
+            android:title="@string/prefs_particle_lifetime_title"
+            android:summary="@string/prefs_particle_lifetime_summary"
+            android:defaultValue="6"
+            android:max="20"
+            app:min="2"
+            app:unitsLeft=""
+            app:unitsRight=" sec"
+        />
+        <!-- For @string references in custom XML namespaces, see
+             http://www.41post.com/4941/programming/android-get-string-resource-at-another-xml-namespace -->
+
+        <ListPreference
+            android:key="@string/prefs_key_dot_size"
+            android:title="@string/prefs_dot_size_title"
+            android:summary="@string/prefs_dot_size_summary"
+            android:defaultValue="0"
+            android:entries="@array/dotSizeOptions"
+            android:entryValues="@array/dotSizeValues"
+        />
+    </PreferenceCategory>
+</PreferenceScreen>

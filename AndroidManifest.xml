@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.github.efung.nexus4wp">
-    <uses-sdk android:minSdkVersion="8"/>
+    <uses-sdk android:minSdkVersion="8"
+              android:targetSdkVersion="14" />
+    <uses-feature
+            android:name="android.software.live_wallpaper"
+            android:required="true" />
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <service
-                android:name="Nexus4LiveWallpaper"
+                android:name=".Nexus4LiveWallpaper"
                 android:enabled="true"
                 android:icon="@drawable/icon"
-                android:label="Nexus 4 Wallpaper"
+                android:label="Iridescence"
                 android:permission="android.permission.BIND_WALLPAPER">
             <intent-filter android:priority="1">
                 <action android:name="android.service.wallpaper.WallpaperService" />
@@ -16,10 +20,10 @@
                     android:name="android.service.wallpaper"
                     android:resource="@xml/wallpaper" />
         </service>
+        <activity
+                android:name=".Nexus4LWPPreferenceActivity"
+                android:exported="true"
+                android:label="@string/app_name"
+                android:theme="@android:style/Theme.WallpaperSettings" />
     </application>
-
-    <uses-feature
-            android:name="android.software.live_wallpaper"
-            android:required="true">
-    </uses-feature>
 </manifest>
