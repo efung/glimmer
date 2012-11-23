@@ -18,8 +18,10 @@ import org.andengine.entity.particle.modifier.IParticleModifier;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.UncoloredSprite;
 import org.andengine.extension.ui.livewallpaper.BaseLiveWallpaperService;
+import org.andengine.input.sensor.SensorDelay;
 import org.andengine.input.sensor.orientation.IOrientationListener;
 import org.andengine.input.sensor.orientation.OrientationData;
+import org.andengine.input.sensor.orientation.OrientationSensorOptions;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
@@ -43,7 +45,6 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
     private float mParticleLifetime;
     private int mDotSize;
 
-    private boolean mSettingsChanged = false;
     private float mCurrentPitch; // rotation around X-axis, screen's horizontal axis (tilting forward and backward)
     private float mCurrentRoll; // rotation around Y-axis, screen's vertical axis (tilting left and right)
 
@@ -59,7 +60,6 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
     public void onCreateResources(OnCreateResourcesCallback pOnCreateResourcesCallback) throws Exception
     {
         readSettingsFromPreferences();
-        this.mSettingsChanged = true;
         PreferenceManager.getDefaultSharedPreferences(Nexus4LiveWallpaper.this).registerOnSharedPreferenceChangeListener(this);
 
         BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
@@ -72,7 +72,6 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
     public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback) throws Exception
     {
         final Scene scene = new Scene();
-        buildScene(scene);
         pOnCreateSceneCallback.onCreateSceneFinished(scene);
     }
 
@@ -83,49 +82,35 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
     }
 
     @Override
-    protected void onPause()
+    public void onPauseGame()
     {
+        super.onPauseGame();
+
         disableSensors();
-        super.onPause();
     }
 
-
     @Override
-    protected void onResume()
+    public void onResumeGame()
     {
-        Scene scene = this.mEngine.getScene();
-
         if (mMode == Nexus4LWPPreferenceActivity.PREFS_MODE_REFLECT_LIGHT)
         {
             enableSensors();
         }
-        if (mSettingsChanged)
-        {
-            resetScene();
-            buildScene(scene);
-            mSettingsChanged = false;
-        }
 
-        super.onResume();
+        resetScene();
+        buildScene(this.mEngine.getScene());
+
+        super.onResumeGame();
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences preference, String s)
     {
-        // TODO: Make this more fine grained. Reflect Light mode only cares if mode or dot size was changed?
-        // We could also disable dot period for reflect light mode.
-        if (s.equals(this.getString(R.string.prefs_key_mode)))
-        {
-            this.mSettingsChanged = true;
-        }
-        else if (s.equals(this.getString(R.string.prefs_key_dot_size)))
-        {
-            this.mSettingsChanged = true;
-        }
-        else if (s.equals(this.getString(R.string.prefs_key_particle_lifetime)))
-        {
-            this.mSettingsChanged = true;
-        }
+        this.onPauseGame();
+
+        readSettingsFromPreferences();
+
+        this.onResumeGame();
     }
 
     private void readSettingsFromPreferences()
@@ -167,7 +152,7 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
 
     private void enableSensors()
     {
-        this.enableOrientationSensor(new IOrientationListener()
+        this.mEngine.enableOrientationSensor(this, new IOrientationListener()
         {
             @Override
             public void onOrientationChanged(OrientationData pOrientationData)
@@ -180,7 +165,9 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
             public void onOrientationAccuracyChanged(OrientationData pOrientationData)
             {
             }
-        });
+        },
+        new OrientationSensorOptions(SensorDelay.GAME) // NORMAL makes it stutter, but GAME uses more battery...
+        );
     }
 
     private void disableSensors()
@@ -202,7 +189,6 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
 
     private void buildScene(final Scene scene)
     {
-        readSettingsFromPreferences();
         loadParticleImage();
 
         switch (mMode)
@@ -222,7 +208,7 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
                 this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight());
         final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles, maxParticles, maxParticles,
+        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles, maxParticles, maxParticles + maxParticles/4 /* A little extra to ensure coverage */,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
         this.mParticleSystem.addParticleInitializer(new ColorParticleInitializer<UncoloredSprite>(getRandomColor()));
@@ -235,14 +221,7 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
             {
                 UncoloredSprite sprite = pParticle.getEntity();
                 final float theta = sprite.getRotation();
-                if (Math.abs(Nexus4LiveWallpaper.this.mCurrentRoll) < 10f)
-                {
-                    sprite.setAlpha(getAlphaFromRotation(theta, Nexus4LiveWallpaper.this.mCurrentPitch));
-                }
-                else
-                {
-                    sprite.setAlpha(getAlphaFromRotation(theta, Nexus4LiveWallpaper.this.mCurrentRoll));
-                }
+                sprite.setAlpha(getAlphaFromRotation(theta, Nexus4LiveWallpaper.this.mCurrentPitch + Nexus4LiveWallpaper.this.mCurrentRoll));
             }
 
             @Override
@@ -253,13 +232,13 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
             }
 
 
-            private float getAlphaFromRotation(final float pParticleRotation, float tilt)
+            private float getAlphaFromRotation(final float pParticleRotation, float pCombinedTilt)
             {
                 // The closer the particle angle is to the tilt angle, the brighter it is.
                 // Can't really see screen if tilt is more than 45 degrees, so we clamp it.
                 // Maximum difference will be 180 degrees, so normalize then convert to alpha.
-                tilt = MathUtils.bringToBounds(-45, 45, tilt);
-                return 1f - Math.abs(pParticleRotation - 2*tilt) / 180f;
+                pCombinedTilt = MathUtils.bringToBounds(-90f, 90f, pCombinedTilt);
+                return MathUtils.bringToBounds(0.2f, 1f, 1f - Math.abs(pParticleRotation - pCombinedTilt) / 180f);
             }
         });
 
