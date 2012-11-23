@@ -13,6 +13,16 @@ public class Nexus4LWPPreferenceActivity extends PreferenceActivity
         addPreferencesFromResource(R.xml.preferences);
 
         // Ensure preference title reflects the current value
+        ListPreference modePref = (ListPreference)findPreference(this.getString(R.string.prefs_key_mode));
+        modePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+        {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object o)
+            {
+                return handleModePreferenceChange((ListPreference) preference, (String)o);
+            }
+        });
+
         ListPreference dotSizePref = (ListPreference)findPreference(this.getString(R.string.prefs_key_dot_size));
         dotSizePref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
         {
@@ -23,15 +33,21 @@ public class Nexus4LWPPreferenceActivity extends PreferenceActivity
             }
         });
 
+        handleModePreferenceChange(modePref, modePref.getValue());
         handleDotSizePreferenceChange(dotSizePref, dotSizePref.getValue());
+    }
+
+    private boolean handleModePreferenceChange(final ListPreference modePref, final String newValue)
+    {
+        modePref.setValue(newValue);
+        modePref.setTitle(this.getString(R.string.prefs_mode_title) + ": " + modePref.getEntry());
+        return true;
     }
 
     private boolean handleDotSizePreferenceChange(final ListPreference dotSizePref, final String newValue)
     {
         dotSizePref.setValue(newValue);
-        dotSizePref.setTitle("Dot Size: " + dotSizePref.getEntry());
+        dotSizePref.setTitle(this.getString(R.string.prefs_dot_size_title) + ": " + dotSizePref.getEntry());
         return true;
     }
-
-
 }

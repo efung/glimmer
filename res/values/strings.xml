@@ -2,12 +2,18 @@
     <string name="app_name">nexus-4-wallpaper</string>
     <string name="wallpaper_description">A subtle, colour-changing pattern of dots inspired by the back of the Nexus 4.</string>
 
+    <string name="prefs_key_mode">mode</string>
     <string name="prefs_key_particle_lifetime">particleLifetime</string>
     <string name="prefs_key_dot_size">dotSize</string>
 
     <string name="prefs_size_small">Small</string>
     <string name="prefs_size_medium">Medium</string>
     <string name="prefs_size_large">Large</string>
+    <string name="prefs_mode_change_colour">Change Colours</string>
+    <string name="prefs_mode_reflect">Reflect Light</string>
+
+    <string name="prefs_mode_title">Mode</string>
+    <string name="prefs_mode_summary">Appearance and behaviour of dots</string>
     <string name="prefs_particle_lifetime_title">Period</string>
     <string name="prefs_particle_lifetime_summary">How long before dot colour changes</string>
     <string name="prefs_dot_size_title">Dot Size</string>
