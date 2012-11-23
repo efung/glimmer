@@ -173,12 +173,12 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
         else if(newValue < mMinValue)
             newValue = mMinValue;
         else if(mInterval != 1 && newValue % mInterval != 0)
-            newValue = Math.round(((float)newValue)/mInterval)*mInterval;g
+            newValue = Math.round(((float)newValue)/mInterval)*mInterval;
 
         // change rejected, revert to the previous value
         if(!callChangeListener(newValue)){
-            seekBar.setProgress(mCurrentValue - mMinValue);g
-            return;g
+            seekBar.setProgress(mCurrentValue - mMinValue);
+            return;
         }
 
         // change accepted, store it
@@ -198,7 +198,7 @@ public class SeekBarPreference extends Preference implements OnSeekBarChangeList
         notifyChanged();
     }
 
-    @Overrideg
+    @Override
     protected Object onGetDefaultValue(TypedArray ta, int index)
     {
         return ta.getInt(index, DEFAULT_VALUE);
