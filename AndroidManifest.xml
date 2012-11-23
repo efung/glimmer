@@ -11,7 +11,7 @@
                 android:name=".Nexus4LiveWallpaper"
                 android:enabled="true"
                 android:icon="@drawable/icon"
-                android:label="Iridescence"
+                android:label="@string/app_name"
                 android:permission="android.permission.BIND_WALLPAPER">
             <intent-filter android:priority="1">
                 <action android:name="android.service.wallpaper.WallpaperService" />

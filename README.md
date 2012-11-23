@@ -1,11 +1,16 @@
-nexus-4-wallpaper
-=================
+Glimmer
+=======
 
-An Android Live Wallpaper featuring a subtle, colour-changing pattern of patterned circles, inspired by
-the back of the Nexus 4 device.
+An Android Live Wallpaper featuring subtly changing patterned circles, inspired by the 
+back of the Nexus 4 device.
 
-Requirements
-------------
+Runtime Requirements
+--------------------
+* Android 2.2+
+* Uses but does not require accelerometer and magnetic sensors
+
+Build Requirements
+-------------------
 
 * Android 4.2 SDK (API 17) or higher
 * Android SDK Tools 17 or higher
