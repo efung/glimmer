@@ -14,19 +14,6 @@
             android:entryValues="@array/modeValues"
             />
 
-    <com.github.efung.nexus4wp.SeekBarPreference
-        android:key="@string/prefs_key_particle_lifetime"
-        android:title="@string/prefs_particle_lifetime_title"
-        android:summary="@string/prefs_particle_lifetime_summary"
-        android:defaultValue="6"
-        android:max="20"
-        app:min="2"
-        app:unitsLeft=""
-        app:unitsRight=" sec"
-    />
-    <!-- For @string references in custom XML namespaces, see
-         http://www.41post.com/4941/programming/android-get-string-resource-at-another-xml-namespace -->
-
     <ListPreference
         android:key="@string/prefs_key_dot_size"
         android:title="@string/prefs_dot_size_title"
@@ -35,4 +22,18 @@
         android:entries="@array/dotSizeOptions"
         android:entryValues="@array/dotSizeValues"
     />
+
+    <com.github.efung.nexus4wp.SeekBarPreference
+            android:key="@string/prefs_key_particle_lifetime"
+            android:title="@string/prefs_particle_lifetime_title"
+            android:summary="@string/prefs_particle_lifetime_summary"
+            android:defaultValue="6"
+            android:max="20"
+            app:min="2"
+            app:unitsLeft=""
+            app:unitsRight=" sec"
+            />
+    <!-- For @string references in custom XML namespaces, see
+         http://www.41post.com/4941/programming/android-get-string-resource-at-another-xml-namespace -->
+
 </PreferenceScreen>
