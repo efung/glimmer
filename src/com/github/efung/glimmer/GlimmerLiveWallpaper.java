@@ -86,19 +86,25 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     {
         super.onPauseGame();
 
+        // Save battery!
         disableSensors();
     }
 
     @Override
     public void onResumeGame()
     {
+        final boolean settingsChanged = readSettingsFromPreferences();
+
         if (mMode == GlimmerPreferenceActivity.PREFS_MODE_REFLECT_LIGHT)
         {
             enableSensors();
         }
 
-        resetScene();
-        buildScene(this.mEngine.getScene());
+        if (settingsChanged)
+        {
+            resetScene();
+            buildScene(this.mEngine.getScene());
+        }
 
         super.onResumeGame();
     }
@@ -107,21 +113,39 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     public void onSharedPreferenceChanged(SharedPreferences preference, String s)
     {
         this.onPauseGame();
-
-        readSettingsFromPreferences();
-
         this.onResumeGame();
     }
 
-    private void readSettingsFromPreferences()
+    private boolean readSettingsFromPreferences()
     {
+        boolean settingsChanged = false;
+        int temp;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GlimmerLiveWallpaper.this);
 
-        this.mMode = Integer.valueOf(prefs.getString(this.getString(R.string.prefs_key_mode), String.valueOf(
-                GlimmerPreferenceActivity.PREFS_MODE_DEFAULT)));
-        this.mDotSize = Integer.valueOf(prefs.getString(this.getString(R.string.prefs_key_dot_size), String.valueOf(
-                GlimmerPreferenceActivity.PREFS_DOT_SIZE_DEFAULT)));
-        this.mParticleLifetime = prefs.getInt(this.getString(R.string.prefs_key_particle_lifetime), 6);
+        temp = Integer.valueOf(prefs.getString(this.getString(R.string.prefs_key_mode),
+                String.valueOf(GlimmerPreferenceActivity.PREFS_MODE_DEFAULT)));
+        if (this.mMode != temp)
+        {
+            this.mMode = temp;
+            settingsChanged = true;
+        }
+
+        temp = Integer.valueOf(prefs.getString(this.getString(R.string.prefs_key_dot_size),
+                String.valueOf(GlimmerPreferenceActivity.PREFS_DOT_SIZE_DEFAULT)));
+        if (this.mDotSize != temp)
+        {
+            this.mDotSize = temp;
+            settingsChanged = true;
+        }
+
+        temp = prefs.getInt(this.getString(R.string.prefs_key_colour_change_period), 6);
+        if (this.mParticleLifetime != temp)
+        {
+            this.mParticleLifetime = temp;
+            settingsChanged = true;
+        }
+
+        return settingsChanged;
     }
 
     private String getParticleFilename(final int prefsDotSize)
@@ -140,7 +164,8 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
 
     private void loadParticleImage()
     {
-        this.mParticleTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas, this, getParticleFilename(this.mDotSize), 0, 0);
+        this.mParticleTextureRegion = BitmapTextureAtlasTextureRegionFactory.createFromAsset(this.mBitmapTextureAtlas,
+                this, getParticleFilename(this.mDotSize), 0, 0);
         this.mBitmapTextureAtlas.load();
     }
 
@@ -166,7 +191,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
             {
             }
         },
-        new OrientationSensorOptions(SensorDelay.GAME) // NORMAL makes it stutter, but GAME uses more battery...
+                new OrientationSensorOptions(SensorDelay.GAME) // NORMAL makes it stutter, but GAME uses more battery...
         );
     }
 
