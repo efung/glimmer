@@ -3,7 +3,7 @@
     <string name="wallpaper_description">A subtle, changing pattern of dots.</string>
 
     <string name="prefs_key_mode">mode</string>
-    <string name="prefs_key_particle_lifetime">particleLifetime</string>
+    <string name="prefs_key_colour_change_period">particleLifetime</string>
     <string name="prefs_key_dot_size">dotSize</string>
 
     <string name="prefs_size_small">Small</string>
@@ -14,8 +14,8 @@
 
     <string name="prefs_mode_title">Mode</string>
     <string name="prefs_mode_summary">Appearance and behaviour of dots</string>
-    <string name="prefs_particle_lifetime_title">Period</string>
-    <string name="prefs_particle_lifetime_summary">How long before dot colour changes</string>
+    <string name="prefs_colour_change_period_title">Period</string>
+    <string name="prefs_colour_change_period_summary">How long before dot colour changes</string>
     <string name="prefs_dot_size_title">Dot Size</string>
     <string name="prefs_dot_size_summary">How large the dot image is</string>
 </resources>

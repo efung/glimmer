@@ -63,7 +63,7 @@ public class GlimmerPreferenceActivity extends PreferenceActivity
         modePref.setValue(newValue);
         modePref.setTitle(this.getString(R.string.prefs_mode_title) + ": " + modePref.getEntry());
 
-        SeekBarPreference seekBarPref = (SeekBarPreference)findPreference(this.getString(R.string.prefs_key_particle_lifetime));
+        SeekBarPreference seekBarPref = (SeekBarPreference)findPreference(this.getString(R.string.prefs_key_colour_change_period));
         seekBarPref.setEnabled(newValue.equals(this.getResources().getStringArray(R.array.modeValues)[PREFS_MODE_CHANGE_COLOUR]));
         return true;
     }

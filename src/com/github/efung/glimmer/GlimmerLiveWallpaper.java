@@ -42,7 +42,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
 
     // Prefs
     private int mMode;
-    private float mParticleLifetime;
+    private float mColourChangePeriod;
     private int mDotSize;
 
     private float mCurrentPitch; // rotation around X-axis, screen's horizontal axis (tilting forward and backward)
@@ -59,7 +59,6 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     @Override
     public void onCreateResources(OnCreateResourcesCallback pOnCreateResourcesCallback) throws Exception
     {
-        readSettingsFromPreferences();
         PreferenceManager.getDefaultSharedPreferences(GlimmerLiveWallpaper.this).registerOnSharedPreferenceChangeListener(this);
 
         BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
@@ -139,9 +138,9 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
         }
 
         temp = prefs.getInt(this.getString(R.string.prefs_key_colour_change_period), 6);
-        if (this.mParticleLifetime != temp)
+        if (this.mColourChangePeriod != temp)
         {
-            this.mParticleLifetime = temp;
+            this.mColourChangePeriod = temp;
             settingsChanged = true;
         }
 
@@ -275,21 +274,23 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
                 this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight());
         final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / (1.5f* mParticleLifetime), maxParticles / mParticleLifetime, maxParticles,
+        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / (1.5f* mColourChangePeriod), maxParticles / mColourChangePeriod, maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
         Color initialColor = getRandomColor();
         ColorParticleInitializer<UncoloredSprite> colorParticleInitializer = new ColorParticleInitializer<UncoloredSprite>(initialColor);
         this.mParticleSystem.addParticleInitializer(colorParticleInitializer);
         this.mParticleSystem.addParticleInitializer(new RotationParticleInitializer<UncoloredSprite>(-90f, 90f));
-        this.mParticleSystem.addParticleInitializer(new ExpireParticleInitializer<UncoloredSprite>(mParticleLifetime));
+        this.mParticleSystem.addParticleInitializer(new ExpireParticleInitializer<UncoloredSprite>(mColourChangePeriod));
 
         this.mParticleSystem.addParticleModifier(
-                new AlphaParticleModifier<UncoloredSprite>(0, mParticleLifetime / 2f, 0.3f, 1f));
-        this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(mParticleLifetime / 2f,
-                mParticleLifetime, 1f, 0.3f));
+                new AlphaParticleModifier<UncoloredSprite>(0, mColourChangePeriod / 2f, 0.3f, 1f));
+        this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(mColourChangePeriod / 2f,
+                mColourChangePeriod, 1f, 0.3f));
 
-        this.mEngine.registerUpdateHandler(new TimerHandler(mParticleLifetime * 0.8f, true, new ChangingColorParticleInitializerTimerHandler(this.mParticleSystem, initialColor, colorParticleInitializer)));
+        this.mEngine.registerUpdateHandler(new TimerHandler(mColourChangePeriod * 0.8f, true,
+                new ChangingColorParticleInitializerTimerHandler(this.mParticleSystem, initialColor,
+                        colorParticleInitializer)));
 
         scene.attachChild(this.mParticleSystem);
     }
