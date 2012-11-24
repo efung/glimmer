@@ -23,7 +23,7 @@
         android:entryValues="@array/dotSizeValues"
     />
 
-    <com.github.efung.nexus4wp.SeekBarPreference
+    <com.github.efung.glimmer.SeekBarPreference
             android:key="@string/prefs_key_particle_lifetime"
             android:title="@string/prefs_particle_lifetime_title"
             android:summary="@string/prefs_particle_lifetime_summary"

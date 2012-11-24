@@ -3,4 +3,4 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:thumbnail="@drawable/icon"
     android:description="@string/wallpaper_description"
-    android:settingsActivity="com.github.efung.nexus4wp.Nexus4LWPPreferenceActivity" />
+    android:settingsActivity="com.github.efung.glimmer.GlimmerPreferenceActivity" />

@@ -1,4 +1,4 @@
-package com.github.efung.nexus4wp;
+package com.github.efung.glimmer;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -30,7 +30,7 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.color.Color;
 import org.andengine.util.math.MathUtils;
 
-public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements SharedPreferences.OnSharedPreferenceChangeListener
+public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     private static final int CAMERA_WIDTH = 480;
     private static final int CAMERA_HEIGHT = 800;
@@ -60,7 +60,7 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
     public void onCreateResources(OnCreateResourcesCallback pOnCreateResourcesCallback) throws Exception
     {
         readSettingsFromPreferences();
-        PreferenceManager.getDefaultSharedPreferences(Nexus4LiveWallpaper.this).registerOnSharedPreferenceChangeListener(this);
+        PreferenceManager.getDefaultSharedPreferences(GlimmerLiveWallpaper.this).registerOnSharedPreferenceChangeListener(this);
 
         BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
         this.mBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 32, 32, BitmapTextureFormat.RGB_565, TextureOptions.BILINEAR);
@@ -92,7 +92,7 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
     @Override
     public void onResumeGame()
     {
-        if (mMode == Nexus4LWPPreferenceActivity.PREFS_MODE_REFLECT_LIGHT)
+        if (mMode == GlimmerPreferenceActivity.PREFS_MODE_REFLECT_LIGHT)
         {
             enableSensors();
         }
@@ -115,12 +115,12 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
 
     private void readSettingsFromPreferences()
     {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(Nexus4LiveWallpaper.this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GlimmerLiveWallpaper.this);
 
         this.mMode = Integer.valueOf(prefs.getString(this.getString(R.string.prefs_key_mode), String.valueOf(
-                Nexus4LWPPreferenceActivity.PREFS_MODE_DEFAULT)));
+                GlimmerPreferenceActivity.PREFS_MODE_DEFAULT)));
         this.mDotSize = Integer.valueOf(prefs.getString(this.getString(R.string.prefs_key_dot_size), String.valueOf(
-                Nexus4LWPPreferenceActivity.PREFS_DOT_SIZE_DEFAULT)));
+                GlimmerPreferenceActivity.PREFS_DOT_SIZE_DEFAULT)));
         this.mParticleLifetime = prefs.getInt(this.getString(R.string.prefs_key_particle_lifetime), 6);
     }
 
@@ -128,12 +128,12 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
     {
         switch (prefsDotSize)
         {
-            case Nexus4LWPPreferenceActivity.PREFS_DOT_SIZE_L:
+            case GlimmerPreferenceActivity.PREFS_DOT_SIZE_L:
                 return "nexusdot_l.png";
-            case Nexus4LWPPreferenceActivity.PREFS_DOT_SIZE_M:
+            case GlimmerPreferenceActivity.PREFS_DOT_SIZE_M:
             default:
                 return "nexusdot_m.png";
-            case Nexus4LWPPreferenceActivity.PREFS_DOT_SIZE_S:
+            case GlimmerPreferenceActivity.PREFS_DOT_SIZE_S:
                 return "nexusdot_s.png";
         }
     }
@@ -157,8 +157,8 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
             @Override
             public void onOrientationChanged(OrientationData pOrientationData)
             {
-                Nexus4LiveWallpaper.this.mCurrentPitch = pOrientationData.getPitch();
-                Nexus4LiveWallpaper.this.mCurrentRoll = pOrientationData.getRoll();
+                GlimmerLiveWallpaper.this.mCurrentPitch = pOrientationData.getPitch();
+                GlimmerLiveWallpaper.this.mCurrentRoll = pOrientationData.getRoll();
             }
 
             @Override
@@ -193,11 +193,11 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
 
         switch (mMode)
         {
-            case Nexus4LWPPreferenceActivity.PREFS_MODE_CHANGE_COLOUR:
+            case GlimmerPreferenceActivity.PREFS_MODE_CHANGE_COLOUR:
             default:
                 buildColourChangeScene(scene);
                 break;
-            case Nexus4LWPPreferenceActivity.PREFS_MODE_REFLECT_LIGHT:
+            case GlimmerPreferenceActivity.PREFS_MODE_REFLECT_LIGHT:
                 buildReflectLightScene(scene);
                 break;
         }
@@ -221,7 +221,7 @@ public class Nexus4LiveWallpaper extends BaseLiveWallpaperService implements Sha
             {
                 UncoloredSprite sprite = pParticle.getEntity();
                 final float theta = sprite.getRotation();
-                sprite.setAlpha(getAlphaFromRotation(theta, Nexus4LiveWallpaper.this.mCurrentPitch + Nexus4LiveWallpaper.this.mCurrentRoll));
+                sprite.setAlpha(getAlphaFromRotation(theta, GlimmerLiveWallpaper.this.mCurrentPitch + GlimmerLiveWallpaper.this.mCurrentRoll));
             }
 
             @Override

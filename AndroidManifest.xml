@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.github.efung.nexus4wp">
+          package="com.github.efung.glimmer">
     <uses-sdk android:minSdkVersion="8"
               android:targetSdkVersion="14" />
     <uses-feature
@@ -8,7 +8,7 @@
             android:required="true" />
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <service
-                android:name=".Nexus4LiveWallpaper"
+                android:name=".GlimmerLiveWallpaper"
                 android:enabled="true"
                 android:icon="@drawable/icon"
                 android:label="@string/app_name"
@@ -21,7 +21,7 @@
                     android:resource="@xml/wallpaper" />
         </service>
         <activity
-                android:name=".Nexus4LWPPreferenceActivity"
+                android:name=".GlimmerPreferenceActivity"
                 android:exported="true"
                 android:label="@string/app_name"
                 android:theme="@android:style/Theme.WallpaperSettings" />

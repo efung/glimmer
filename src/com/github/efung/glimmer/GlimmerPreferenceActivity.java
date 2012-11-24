@@ -1,4 +1,4 @@
-package com.github.efung.nexus4wp;
+package com.github.efung.glimmer;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -8,7 +8,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 
-public class Nexus4LWPPreferenceActivity extends PreferenceActivity
+public class GlimmerPreferenceActivity extends PreferenceActivity
 {
     public static final int PREFS_DOT_SIZE_S = 0;
     public static final int PREFS_DOT_SIZE_M = 1;

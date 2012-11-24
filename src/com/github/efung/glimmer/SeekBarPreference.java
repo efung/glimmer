@@ -1,4 +1,4 @@
-package com.github.efung.nexus4wp;
+package com.github.efung.glimmer;
 
 import android.content.Context;
 import android.content.res.TypedArray;
