@@ -18,7 +18,7 @@
         android:key="@string/prefs_key_dot_size"
         android:title="@string/prefs_dot_size_title"
         android:summary="@string/prefs_dot_size_summary"
-        android:defaultValue="0"
+        android:defaultValue="1"
         android:entries="@array/dotSizeOptions"
         android:entryValues="@array/dotSizeValues"
     />
