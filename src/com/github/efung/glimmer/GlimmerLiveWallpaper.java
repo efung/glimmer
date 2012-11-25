@@ -87,7 +87,6 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     {
         super.onPauseGame();
 
-        // Save battery!
         disableSensors();
     }
 
@@ -232,7 +231,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     private void buildReflectLightScene(final Scene scene)
     {
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
-                this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight());
+                this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
         final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
         this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles, maxParticles, maxParticles + maxParticles/4 /* A little extra to ensure coverage */,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
@@ -246,8 +245,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
             public void onUpdateParticle(Particle<UncoloredSprite> pParticle)
             {
                 UncoloredSprite sprite = pParticle.getEntity();
-                final float theta = sprite.getRotation();
-                sprite.setAlpha(getAlphaFromRotation(theta, GlimmerLiveWallpaper.this.mCurrentPitch + GlimmerLiveWallpaper.this.mCurrentRoll));
+                sprite.setAlpha(getAlphaFromRotation(sprite.getRotation(), GlimmerLiveWallpaper.this.mCurrentPitch + GlimmerLiveWallpaper.this.mCurrentRoll));
             }
 
             @Override
@@ -274,7 +272,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     private void buildColourChangeScene(final Scene scene)
     {
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
-                this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight());
+                this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
         final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
         this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / PARTICLE_LIFETIME, maxParticles / PARTICLE_LIFETIME, maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
@@ -334,5 +332,4 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
             this.mCurrentParticleInitializer.setColor(r, r, g, g, b, b);
         }
     }
-
 }
