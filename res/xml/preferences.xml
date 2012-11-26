@@ -35,5 +35,16 @@
             />
     <!-- For @string references in custom XML namespaces, see
          http://www.41post.com/4941/programming/android-get-string-resource-at-another-xml-namespace -->
+         
+    <com.github.efung.glimmer.SeekBarPreference
+            android:key="@string/prefs_key_brightness"
+            android:title="@string/prefs_brightness_title"
+            android:summary="@string/prefs_brightness_summary"
+            android:defaultValue="50"
+            android:max="100"
+            app:min="0"
+            app:unitsLeft=""
+            app:unitsRight="%"
+            />
 
 </PreferenceScreen>
