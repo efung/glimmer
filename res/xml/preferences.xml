@@ -36,4 +36,11 @@
     <!-- For @string references in custom XML namespaces, see
          http://www.41post.com/4941/programming/android-get-string-resource-at-another-xml-namespace -->
 
+    <net.margaritov.preference.colorpicker.ColorPickerPreference
+            android:key="@string/prefs_key_single_colour"
+            android:title="@string/prefs_static_colour_title"
+            android:summary="@string/prefs_static_colour_summary"
+            android:defaultValue="@color/wheat"
+    />
+
 </PreferenceScreen>

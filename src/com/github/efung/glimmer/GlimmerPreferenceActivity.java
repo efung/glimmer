@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import net.margaritov.preference.colorpicker.ColorPickerPreference;
 
 public class GlimmerPreferenceActivity extends PreferenceActivity
 {
@@ -17,7 +18,13 @@ public class GlimmerPreferenceActivity extends PreferenceActivity
 
     public static final int PREFS_MODE_CHANGE_COLOUR = 0;
     public static final int PREFS_MODE_REFLECT_LIGHT = 1;
+    public static final int PREFS_MODE_STATIC_COLOUR = 2;
+
     public static final int PREFS_MODE_DEFAULT = PREFS_MODE_CHANGE_COLOUR;
+
+    public static final int PREFS_COLOUR_CHANGE_PERIOD_DEFAULT = 6;
+
+    public static final int PREFS_SINGLE_COLOUR_DEFAULT = 0xFFF5DEB3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +70,13 @@ public class GlimmerPreferenceActivity extends PreferenceActivity
         modePref.setValue(newValue);
         modePref.setTitle(this.getString(R.string.prefs_mode_title) + ": " + modePref.getEntry());
 
-        SeekBarPreference seekBarPref = (SeekBarPreference)findPreference(this.getString(R.string.prefs_key_colour_change_period));
-        seekBarPref.setEnabled(newValue.equals(this.getResources().getStringArray(R.array.modeValues)[PREFS_MODE_CHANGE_COLOUR]));
+        SeekBarPreference colourChangePref = (SeekBarPreference)findPreference(this.getString(R.string.prefs_key_colour_change_period));
+        colourChangePref.setEnabled(
+                newValue.equals(this.getResources().getStringArray(R.array.modeValues)[PREFS_MODE_CHANGE_COLOUR]));
+
+        ColorPickerPreference staticColourPref = (ColorPickerPreference)findPreference(this.getString(R.string.prefs_key_single_colour));
+        staticColourPref.setEnabled(!
+                newValue.equals(this.getResources().getStringArray(R.array.modeValues)[PREFS_MODE_CHANGE_COLOUR]));
         return true;
     }
 

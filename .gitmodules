@@ -4,3 +4,6 @@
 [submodule "AndEngineLiveWallpaperExtension"]
 	path = AndEngineLiveWallpaperExtension
 	url = git://github.com/nicolasgramlich/AndEngineLiveWallpaperExtension.git
+[submodule "android-ColorPickerPreference"]
+	path = android-ColorPickerPreference
+	url = git://github.com/jayschwa/android-ColorPickerPreference.git

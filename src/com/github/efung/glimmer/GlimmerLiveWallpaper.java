@@ -28,6 +28,7 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegion
 import org.andengine.opengl.texture.bitmap.BitmapTextureFormat;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.color.Color;
+import org.andengine.util.color.ColorUtils;
 import org.andengine.util.math.MathUtils;
 
 public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements SharedPreferences.OnSharedPreferenceChangeListener
@@ -35,7 +36,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     private static final int CAMERA_WIDTH = 480;
     private static final int CAMERA_HEIGHT = 800;
 
-    private static final float PARTICLE_LIFETIME = 6.0f;
+    private static final float PARTICLE_LIFETIME = 9.0f;
 
     private Camera mCamera;
     private BitmapTextureAtlas mBitmapTextureAtlas;
@@ -46,6 +47,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     private int mMode;
     private float mColourChangePeriod;
     private int mDotSize;
+    private int mStaticColour; // ARGB packed
 
     private float mCurrentPitch; // rotation around X-axis, screen's horizontal axis (tilting forward and backward)
     private float mCurrentRoll; // rotation around Y-axis, screen's vertical axis (tilting left and right)
@@ -138,10 +140,17 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
             settingsChanged = true;
         }
 
-        temp = prefs.getInt(this.getString(R.string.prefs_key_colour_change_period), 6);
+        temp = prefs.getInt(this.getString(R.string.prefs_key_colour_change_period), GlimmerPreferenceActivity.PREFS_COLOUR_CHANGE_PERIOD_DEFAULT);
         if (this.mColourChangePeriod != temp)
         {
             this.mColourChangePeriod = temp;
+            settingsChanged = true;
+        }
+
+        temp = prefs.getInt(this.getString(R.string.prefs_key_single_colour), GlimmerPreferenceActivity.PREFS_SINGLE_COLOUR_DEFAULT);
+        if (this.mStaticColour != temp)
+        {
+            this.mStaticColour = temp;
             settingsChanged = true;
         }
 
@@ -225,6 +234,10 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
             case GlimmerPreferenceActivity.PREFS_MODE_REFLECT_LIGHT:
                 buildReflectLightScene(scene);
                 break;
+            case GlimmerPreferenceActivity.PREFS_MODE_STATIC_COLOUR:
+                buildStaticColourScene(scene);
+                break;
+
         }
     }
 
@@ -233,10 +246,11 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
                 this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
         final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles, maxParticles, maxParticles + maxParticles/4 /* A little extra to ensure coverage */,
+        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles, maxParticles, maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
-        this.mParticleSystem.addParticleInitializer(new ColorParticleInitializer<UncoloredSprite>(getRandomColor()));
+        this.mParticleSystem.addParticleInitializer(new ColorParticleInitializer<UncoloredSprite>(ColorUtils.convertARGBPackedIntToColor(
+                mStaticColour)));
         this.mParticleSystem.addParticleInitializer(new RotationParticleInitializer<UncoloredSprite>(-90f, 90f));
 
         this.mParticleSystem.addParticleModifier(new IParticleModifier<UncoloredSprite>()
@@ -269,12 +283,33 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
         scene.attachChild(this.mParticleSystem);
     }
 
+    private void buildStaticColourScene(final Scene scene)
+    {
+        final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
+                this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
+        final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
+        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / PARTICLE_LIFETIME + 1, maxParticles / PARTICLE_LIFETIME - 1, maxParticles,
+                this.mParticleTextureRegion, this.getVertexBufferObjectManager());
+
+        ColorParticleInitializer<UncoloredSprite> colorParticleInitializer = new ColorParticleInitializer<UncoloredSprite>(ColorUtils.convertARGBPackedIntToColor(
+                mStaticColour));
+        this.mParticleSystem.addParticleInitializer(colorParticleInitializer);
+        this.mParticleSystem.addParticleInitializer(new RotationParticleInitializer<UncoloredSprite>(-90f, 90f));
+        this.mParticleSystem.addParticleInitializer(new ExpireParticleInitializer<UncoloredSprite>(PARTICLE_LIFETIME));
+
+        this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(0, PARTICLE_LIFETIME * 0.6666f, 0.3f, 1f));
+        this.mParticleSystem.addParticleModifier(
+                new AlphaParticleModifier<UncoloredSprite>(PARTICLE_LIFETIME * 0.6666f, PARTICLE_LIFETIME, 1f, 0.3f));
+
+        scene.attachChild(this.mParticleSystem);
+    }
+
     private void buildColourChangeScene(final Scene scene)
     {
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
                 this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
         final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / PARTICLE_LIFETIME, maxParticles / PARTICLE_LIFETIME, maxParticles,
+        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / PARTICLE_LIFETIME + 1, maxParticles / PARTICLE_LIFETIME - 1, maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
         Color initialColor = getRandomColor();
@@ -283,8 +318,8 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
         this.mParticleSystem.addParticleInitializer(new RotationParticleInitializer<UncoloredSprite>(-90f, 90f));
         this.mParticleSystem.addParticleInitializer(new ExpireParticleInitializer<UncoloredSprite>(PARTICLE_LIFETIME));
 
-        this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(0, PARTICLE_LIFETIME / 2f, 0.3f, 1f));
-        this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(PARTICLE_LIFETIME / 2f, PARTICLE_LIFETIME, 1f, 0.3f));
+        this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(0, PARTICLE_LIFETIME * 0.6666f, 0.3f, 1f));
+        this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(PARTICLE_LIFETIME * 0.6666f, PARTICLE_LIFETIME, 1f, 0.3f));
 
         this.mEngine.registerUpdateHandler(new TimerHandler(mColourChangePeriod, true,
                 new ChangingColorParticleInitializerTimerHandler(this.mParticleSystem, initialColor,
@@ -320,8 +355,8 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
             else if (hsv[0] < 0f) {
                 hsv[0] += 360f;
             }
-            hsv[1] = MathUtils.bringToBounds(0.3f, 0.7f, hsv[1] + MathUtils.randomSign() * 0.1f);
-            hsv[2] = MathUtils.bringToBounds(0.3f, 0.7f, hsv[2] + MathUtils.randomSign() * 0.1f);
+            hsv[1] = MathUtils.bringToBounds(0.4f, 0.7f, hsv[1] + MathUtils.randomSign() * 0.1f);
+            hsv[2] = MathUtils.bringToBounds(0.4f, 0.7f, hsv[2] + MathUtils.randomSign() * 0.1f);
 
             this.mCurrentParticleColorARGB = android.graphics.Color.HSVToColor(hsv);
 
