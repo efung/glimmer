@@ -12,14 +12,15 @@ Or, scan QR code below:
 
 Release History
 ---------------
-* 1.0 - 2012-11-25
-** Initial Google Play release
 
-* 1.1 - 2012-12-02
-** Add new mode: Single Color
-** Add color picker for use with Reflect Light and Single Color modes
-** Fix stability issues for some Samsung devices when using Wallpaper | Configure shortcut
-** Minor UI tweaks for devices with Holo theme support
+**1.1** (2012-12-02)
+- Add new mode: Single Color
+- Add color picker for use with Reflect Light and Single Color modes
+- Fix stability issues for some Samsung devices when using Wallpaper | Configure shortcut
+- Minor UI tweaks for devices with Holo theme support
+
+**1.0** (2012-11-25)
+- Initial Google Play release
 
 Runtime Requirements
 --------------------
