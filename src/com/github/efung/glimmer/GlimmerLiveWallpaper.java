@@ -39,7 +39,7 @@ import org.andengine.util.color.Color;
 import org.andengine.util.color.ColorUtils;
 import org.andengine.util.math.MathUtils;
 
-public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements SharedPreferences.OnSharedPreferenceChangeListener
+public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
 {
     private static final int CAMERA_WIDTH = 480;
     private static final int CAMERA_HEIGHT = 800;
@@ -81,8 +81,6 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     @Override
     public void onCreateResources(OnCreateResourcesCallback pOnCreateResourcesCallback) throws Exception
     {
-        PreferenceManager.getDefaultSharedPreferences(GlimmerLiveWallpaper.this).registerOnSharedPreferenceChangeListener(this);
-
         BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
         this.mBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 32, 32, BitmapTextureFormat.RGB_565, TextureOptions.BILINEAR);
 
@@ -131,13 +129,6 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
         }
 
         super.onResumeGame();
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences preference, String s)
-    {
-        this.onPauseGame();
-        this.onResumeGame();
     }
 
     private boolean readSettingsFromPreferences()
