@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://github.com/efung/seekbar"
+    android:key="preference_screen">
+
+    <ListPreference
+            android:key="@string/prefs_key_mode"
+            android:title="@string/prefs_mode_title"
+            android:summary="@string/prefs_mode_summary"
+            android:defaultValue="0"
+            android:entries="@array/modeOptions"
+            android:entryValues="@array/modeValues"
+            />
+
+    <ListPreference
+        android:key="@string/prefs_key_dot_size"
+        android:title="@string/prefs_dot_size_title"
+        android:summary="@string/prefs_dot_size_summary"
+        android:defaultValue="1"
+        android:entries="@array/dotSizeOptions"
+        android:entryValues="@array/dotSizeValues"
+    />
+
+    <com.github.efung.glimmer.SeekBarPreference
+            android:key="@string/prefs_key_colour_change_period"
+            android:title="@string/prefs_colour_change_period_title"
+            android:summary="@string/prefs_colour_change_period_summary"
+            android:defaultValue="6"
+            android:max="20"
+            app:min="2"
+            app:unitsLeft=""
+            app:unitsRight=" sec"
+            />
+    <!-- For @string references in custom XML namespaces, see
+         http://www.41post.com/4941/programming/android-get-string-resource-at-another-xml-namespace -->
+
+    <net.margaritov.preference.colorpicker.ColorPickerPreference
+            android:key="@string/prefs_key_single_colour"
+            android:title="@string/prefs_static_colour_title"
+            android:summary="@string/prefs_static_colour_summary"
+            android:defaultValue="@color/wheat"
+    />
+
+    <SwitchPreference
+            android:key="@string/prefs_key_display_fps"
+            android:title="@string/prefs_show_fps_title"
+            android:summary="@string/prefs_show_fps_summary"
+            android:defaultValue="false" />
+
+</PreferenceScreen>
