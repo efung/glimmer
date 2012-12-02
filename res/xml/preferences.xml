@@ -43,4 +43,10 @@
             android:defaultValue="@color/wheat"
     />
 
+    <CheckBoxPreference
+            android:key="@string/prefs_key_display_fps"
+            android:title="@string/prefs_show_fps_title"
+            android:summary="@string/prefs_show_fps_summary"
+            android:defaultValue="false" />
+
 </PreferenceScreen>

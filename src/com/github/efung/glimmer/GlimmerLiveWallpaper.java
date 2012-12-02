@@ -1,7 +1,9 @@
 package com.github.efung.glimmer;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.preference.PreferenceManager;
+import org.andengine.engine.LimitedFPSEngine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
@@ -17,16 +19,22 @@ import org.andengine.entity.particle.modifier.ExpireParticleInitializer;
 import org.andengine.entity.particle.modifier.IParticleModifier;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.UncoloredSprite;
+import org.andengine.entity.text.Text;
+import org.andengine.entity.text.TextOptions;
+import org.andengine.entity.util.AverageFPSCounter;
 import org.andengine.extension.ui.livewallpaper.BaseLiveWallpaperService;
 import org.andengine.input.sensor.SensorDelay;
 import org.andengine.input.sensor.orientation.IOrientationListener;
 import org.andengine.input.sensor.orientation.OrientationData;
 import org.andengine.input.sensor.orientation.OrientationSensorOptions;
+import org.andengine.opengl.font.Font;
+import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.bitmap.BitmapTextureFormat;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.util.HorizontalAlign;
 import org.andengine.util.color.Color;
 import org.andengine.util.color.ColorUtils;
 import org.andengine.util.math.MathUtils;
@@ -37,6 +45,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     private static final int CAMERA_HEIGHT = 800;
 
     private static final float PARTICLE_LIFETIME = 9.0f;
+    private static final int MAX_FRAMES_PER_SECOND = 24;
 
     private Camera mCamera;
     private BitmapTextureAtlas mBitmapTextureAtlas;
@@ -48,9 +57,11 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     private float mColourChangePeriod;
     private int mDotSize;
     private int mStaticColour; // ARGB packed
+    private boolean mShowFps;
 
     private float mCurrentPitch; // rotation around X-axis, screen's horizontal axis (tilting forward and backward)
     private float mCurrentRoll; // rotation around Y-axis, screen's vertical axis (tilting left and right)
+    private Font mFont;
 
 
     @Override
@@ -61,12 +72,23 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
     }
 
     @Override
+    public org.andengine.engine.Engine onCreateEngine(final EngineOptions pEngineOptions)
+    {
+        return new LimitedFPSEngine(pEngineOptions, MAX_FRAMES_PER_SECOND);
+//        return new org.andengine.engine.Engine(pEngineOptions);
+    }
+
+    @Override
     public void onCreateResources(OnCreateResourcesCallback pOnCreateResourcesCallback) throws Exception
     {
         PreferenceManager.getDefaultSharedPreferences(GlimmerLiveWallpaper.this).registerOnSharedPreferenceChangeListener(this);
 
         BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
         this.mBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 32, 32, BitmapTextureFormat.RGB_565, TextureOptions.BILINEAR);
+
+        this.mFont = FontFactory.create(this.getFontManager(), this.getTextureManager(), 256, 256,
+                TextureOptions.BILINEAR, Typeface.DEFAULT, 24, android.graphics.Color.WHITE);
+        this.mFont.load();
 
         pOnCreateResourcesCallback.onCreateResourcesFinished();
     }
@@ -154,6 +176,13 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
             settingsChanged = true;
         }
 
+        boolean showFps = prefs.getBoolean(this.getString(R.string.prefs_key_display_fps), false);
+        if (this.mShowFps != showFps)
+        {
+            this.mShowFps = showFps;
+            settingsChanged = true;
+        }
+
         return settingsChanged;
     }
 
@@ -216,9 +245,9 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
 
     private void resetScene()
     {
-        unloadParticleImage();
-        this.mEngine.getScene().detachChildren();
         this.mEngine.clearUpdateHandlers();
+        this.mEngine.getScene().detachChildren();
+        unloadParticleImage();
     }
 
     private void buildScene(final Scene scene)
@@ -239,6 +268,30 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
                 break;
 
         }
+
+        if (mShowFps)
+        {
+            buildFpsDisplay(scene);
+        }
+    }
+
+    private void buildFpsDisplay(final Scene scene)
+    {
+        final int FPS_X = CAMERA_WIDTH;
+        final int FPS_Y = 600; // Above icon bar
+        final Text fpsText = new Text(FPS_X, FPS_Y, this.mFont, "0.0", 8, new TextOptions(HorizontalAlign.RIGHT), this.getVertexBufferObjectManager());
+        fpsText.setPosition(FPS_X - fpsText.getWidth(), FPS_Y);
+        scene.attachChild(fpsText);
+
+        this.mEngine.registerUpdateHandler( new AverageFPSCounter(5.0f)
+        {
+            @Override
+            protected void onHandleAverageDurationElapsed(float pFPS)
+            {
+                fpsText.setText(String.valueOf(Math.round(pFPS * 10) / 10f)); // Round to one decimal
+                fpsText.setPosition(FPS_X - fpsText.getWidth(), FPS_Y); // Bottom right corner
+            }
+        });
     }
 
     private void buildReflectLightScene(final Scene scene)

@@ -6,6 +6,7 @@
     <string name="prefs_key_colour_change_period">particleLifetime</string>
     <string name="prefs_key_dot_size">dotSize</string>
     <string name="prefs_key_single_colour">singleColour</string>
+    <string name="prefs_key_display_fps">showFps</string>
 
     <string name="prefs_size_small">Small</string>
     <string name="prefs_size_medium">Medium</string>
@@ -22,4 +23,6 @@
     <string name="prefs_dot_size_summary">How large the dot image is</string>
     <string name="prefs_static_colour_title">Dot Colour</string>
     <string name="prefs_static_colour_summary">What colour the dots should be</string>
+    <string name="prefs_show_fps_title">Show FPS</string>
+    <string name="prefs_show_fps_summary">Whether to display frames per second</string>
 </resources>
