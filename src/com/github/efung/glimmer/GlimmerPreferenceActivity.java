@@ -26,10 +26,19 @@ public class GlimmerPreferenceActivity extends PreferenceActivity
 
     public static final int PREFS_SINGLE_COLOUR_DEFAULT = 0xFFF5DEB3;
 
+    public static final boolean PREFS_SHOW_FPS_DEFAULT = false;
+
+    private ColorPickerPreference mSingleColourPreference;
+    private SeekBarPreference mColourChangePeriodPref;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
+
+        this.mSingleColourPreference = (ColorPickerPreference)findPreference(this.getString(R.string.prefs_key_single_colour));
+        this.mColourChangePeriodPref = (SeekBarPreference)findPreference(this.getString(R.string.prefs_key_colour_change_period));
 
         ListPreference modePref = (ListPreference)findPreference(this.getString(R.string.prefs_key_mode));
 
@@ -70,13 +79,17 @@ public class GlimmerPreferenceActivity extends PreferenceActivity
         modePref.setValue(newValue);
         modePref.setTitle(this.getString(R.string.prefs_mode_title) + ": " + modePref.getEntry());
 
-        SeekBarPreference colourChangePref = (SeekBarPreference)findPreference(this.getString(R.string.prefs_key_colour_change_period));
-        colourChangePref.setEnabled(
-                newValue.equals(this.getResources().getStringArray(R.array.modeValues)[PREFS_MODE_CHANGE_COLOUR]));
+        if (newValue.equals(this.getResources().getStringArray(R.array.modeValues)[PREFS_MODE_CHANGE_COLOUR]))
+        {
+            this.getPreferenceScreen().addPreference(this.mColourChangePeriodPref);
+            this.getPreferenceScreen().removePreference(this.mSingleColourPreference);
+        }
+        else
+        {
+            this.getPreferenceScreen().removePreference(this.mColourChangePeriodPref);
+            this.getPreferenceScreen().addPreference(this.mSingleColourPreference);
+        }
 
-        ColorPickerPreference staticColourPref = (ColorPickerPreference)findPreference(this.getString(R.string.prefs_key_single_colour));
-        staticColourPref.setEnabled(!
-                newValue.equals(this.getResources().getStringArray(R.array.modeValues)[PREFS_MODE_CHANGE_COLOUR]));
         return true;
     }
 

@@ -176,7 +176,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService implements Sh
             settingsChanged = true;
         }
 
-        boolean showFps = prefs.getBoolean(this.getString(R.string.prefs_key_display_fps), false);
+        boolean showFps = prefs.getBoolean(this.getString(R.string.prefs_key_display_fps), GlimmerPreferenceActivity.PREFS_SHOW_FPS_DEFAULT);
         if (this.mShowFps != showFps)
         {
             this.mShowFps = showFps;
