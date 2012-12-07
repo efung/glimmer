@@ -4,10 +4,6 @@ import org.andengine.entity.IEntity;
 import org.andengine.entity.particle.initializer.ColorParticleInitializer;
 import org.andengine.util.color.Color;
 
-/**
- * Created by efung on 2012-11-23
- * Copyright 2012 Zynga. All Rights Reserved.
- */
 public class MutableColorParticleInitializer<T extends IEntity> extends ColorParticleInitializer<T>
 {
     public MutableColorParticleInitializer(final Color pColor)
