@@ -81,13 +81,8 @@ public class GridParticleEmitter extends BaseRectangleParticleEmitter
         Collections.shuffle(Arrays.asList(pArray));
     }
 
-    public int getGridTilesY()
+    public int getGridTiles()
     {
-        return mGridTilesY;
-    }
-
-    public int getGridTilesX()
-    {
-        return mGridTilesX;
+        return mGridTiles;
     }
 }

@@ -3,13 +3,14 @@ package com.github.efung.glimmer;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import org.andengine.engine.LimitedFPSEngine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
-import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
+import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.entity.particle.BatchedSpriteParticleSystem;
 import org.andengine.entity.particle.Particle;
 import org.andengine.entity.particle.initializer.ColorParticleInitializer;
@@ -41,11 +42,11 @@ import org.andengine.util.math.MathUtils;
 
 public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
 {
-    private static final int CAMERA_WIDTH = 480;
-    private static final int CAMERA_HEIGHT = 800;
-
     private static final float PARTICLE_LIFETIME = 9.0f;
     private static final int MAX_FRAMES_PER_SECOND = 24;
+
+    private int CAMERA_WIDTH;
+    private int CAMERA_HEIGHT;
 
     private Camera mCamera;
     private BitmapTextureAtlas mBitmapTextureAtlas;
@@ -67,8 +68,10 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
     @Override
     public EngineOptions onCreateEngineOptions()
     {
+        this.CAMERA_WIDTH = this.getResources().getDisplayMetrics().widthPixels;
+        this.CAMERA_HEIGHT = this.getResources().getDisplayMetrics().heightPixels;
         this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-        return new EngineOptions(true, ScreenOrientation.PORTRAIT_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), this.mCamera);
+        return new EngineOptions(true, ScreenOrientation.PORTRAIT_FIXED, new FillResolutionPolicy(), this.mCamera);
     }
 
     @Override
@@ -268,8 +271,9 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
 
     private void buildFpsDisplay(final Scene scene)
     {
+        DisplayMetrics metrics = this.getResources().getDisplayMetrics();
         final int FPS_X = CAMERA_WIDTH;
-        final int FPS_Y = 600; // Above icon bar
+        final int FPS_Y = CAMERA_HEIGHT - (96 * metrics.densityDpi / 160); // Avoid navigation bar
         final Text fpsText = new Text(FPS_X, FPS_Y, this.mFont, "0.0", 8, new TextOptions(HorizontalAlign.RIGHT), this.getVertexBufferObjectManager());
         fpsText.setPosition(FPS_X - fpsText.getWidth(), FPS_Y);
         scene.attachChild(fpsText);
@@ -289,7 +293,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
     {
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
                 this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
-        final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
+        final int maxParticles = particleEmitter.getGridTiles();
         this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles, maxParticles, maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
@@ -331,8 +335,8 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
     {
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
                 this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
-        final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / PARTICLE_LIFETIME + 1, maxParticles / PARTICLE_LIFETIME - 1, maxParticles,
+        final int maxParticles = particleEmitter.getGridTiles();
+        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, 1, maxParticles / PARTICLE_LIFETIME - 1, maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
         ColorParticleInitializer<UncoloredSprite> colorParticleInitializer = new ColorParticleInitializer<UncoloredSprite>(ColorUtils.convertARGBPackedIntToColor(
@@ -352,8 +356,8 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
     {
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
                 this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
-        final int maxParticles = particleEmitter.getGridTilesX() * particleEmitter.getGridTilesY();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / PARTICLE_LIFETIME + 1, maxParticles / PARTICLE_LIFETIME - 1, maxParticles,
+        final int maxParticles = particleEmitter.getGridTiles();
+        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, 1, maxParticles / PARTICLE_LIFETIME - 1, maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
         Color initialColor = getRandomColor();
