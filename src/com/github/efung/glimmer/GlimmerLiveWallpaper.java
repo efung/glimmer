@@ -336,7 +336,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
                 this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
         final int maxParticles = particleEmitter.getGridTiles();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, 1, maxParticles / PARTICLE_LIFETIME - 1, maxParticles,
+        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / (2*PARTICLE_LIFETIME), maxParticles / (PARTICLE_LIFETIME + 1), maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
         ColorParticleInitializer<UncoloredSprite> colorParticleInitializer = new ColorParticleInitializer<UncoloredSprite>(ColorUtils.convertARGBPackedIntToColor(
@@ -357,7 +357,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
                 this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
         final int maxParticles = particleEmitter.getGridTiles();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, 1, maxParticles / PARTICLE_LIFETIME - 1, maxParticles,
+        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / (2*PARTICLE_LIFETIME), maxParticles / (PARTICLE_LIFETIME + 1), maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
         Color initialColor = getRandomColor();
