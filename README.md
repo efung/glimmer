@@ -13,6 +13,11 @@ Or, scan QR code below:
 Release History
 ---------------
 
+**1.1.1** (2012-12-16)
+- Draw using native resolution instead of stretching to 3:5 aspect ratio. Should look better on tablets.
+- Fix pulsing behaviour
+- Don't let dots overlap
+
 **1.1** (2012-12-02)
 - Add new mode: Single Color
 - Add color picker for use with Reflect Light and Single Color modes
