@@ -13,6 +13,7 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.FillResolutionPolicy;
 import org.andengine.entity.particle.BatchedSpriteParticleSystem;
 import org.andengine.entity.particle.Particle;
+import org.andengine.entity.particle.ParticleSystem;
 import org.andengine.entity.particle.initializer.ColorParticleInitializer;
 import org.andengine.entity.particle.initializer.RotationParticleInitializer;
 import org.andengine.entity.particle.modifier.AlphaParticleModifier;
@@ -51,7 +52,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
     private Camera mCamera;
     private BitmapTextureAtlas mBitmapTextureAtlas;
     private ITextureRegion mParticleTextureRegion;
-    private BatchedSpriteParticleSystem mParticleSystem;
+    private ParticleSystem<UncoloredSprite> mParticleSystem;
 
     // Prefs
     private int mMode;
@@ -336,11 +337,10 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
                 this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
         final int maxParticles = particleEmitter.getGridTiles();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / (2*PARTICLE_LIFETIME), maxParticles / (PARTICLE_LIFETIME + 1), maxParticles,
+        this.mParticleSystem = new GlimmerParticleSystem(particleEmitter, 0.05f * maxParticles, maxParticles / PARTICLE_LIFETIME, maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
-        ColorParticleInitializer<UncoloredSprite> colorParticleInitializer = new ColorParticleInitializer<UncoloredSprite>(ColorUtils.convertARGBPackedIntToColor(
-                mStaticColour));
+        ColorParticleInitializer<UncoloredSprite> colorParticleInitializer = new ColorParticleInitializer<UncoloredSprite>(ColorUtils.convertARGBPackedIntToColor(mStaticColour));
         this.mParticleSystem.addParticleInitializer(colorParticleInitializer);
         this.mParticleSystem.addParticleInitializer(new RotationParticleInitializer<UncoloredSprite>(-90f, 90f));
         this.mParticleSystem.addParticleInitializer(new ExpireParticleInitializer<UncoloredSprite>(PARTICLE_LIFETIME));
@@ -357,7 +357,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
         final GridParticleEmitter particleEmitter = new GridParticleEmitter(CAMERA_WIDTH * 0.5f,  CAMERA_HEIGHT * 0.5f, CAMERA_WIDTH, CAMERA_HEIGHT,
                 this.mParticleTextureRegion.getWidth(), this.mParticleTextureRegion.getHeight(), false);
         final int maxParticles = particleEmitter.getGridTiles();
-        this.mParticleSystem = new BatchedSpriteParticleSystem(particleEmitter, maxParticles / (2*PARTICLE_LIFETIME), maxParticles / (PARTICLE_LIFETIME + 1), maxParticles,
+        this.mParticleSystem = new GlimmerParticleSystem(particleEmitter, 0.05f * maxParticles, maxParticles / PARTICLE_LIFETIME, maxParticles,
                 this.mParticleTextureRegion, this.getVertexBufferObjectManager());
 
         Color initialColor = getRandomColor();
@@ -370,8 +370,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
         this.mParticleSystem.addParticleModifier(new AlphaParticleModifier<UncoloredSprite>(PARTICLE_LIFETIME * 0.6666f, PARTICLE_LIFETIME, 1f, 0.3f));
 
         this.mEngine.registerUpdateHandler(new TimerHandler(mColourChangePeriod, true,
-                new ChangingColorParticleInitializerTimerHandler(this.mParticleSystem, initialColor,
-                        colorParticleInitializer)));
+                new ChangingColorParticleInitializerTimerHandler(initialColor, colorParticleInitializer)));
 
         scene.attachChild(this.mParticleSystem);
     }
@@ -381,11 +380,9 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
         private int mCurrentParticleColorARGB;
         private float hsv[] = new float[3];
         private MutableColorParticleInitializer<UncoloredSprite> mCurrentParticleInitializer;
-        private BatchedSpriteParticleSystem mParticleSystem;
 
-        public ChangingColorParticleInitializerTimerHandler(final BatchedSpriteParticleSystem pParticleSystem, final Color pColor, final MutableColorParticleInitializer<UncoloredSprite> pInitializer)
+        public ChangingColorParticleInitializerTimerHandler(final Color pColor, final MutableColorParticleInitializer<UncoloredSprite> pInitializer)
         {
-            this.mParticleSystem = pParticleSystem;
             this.mCurrentParticleInitializer = pInitializer;
             this.mCurrentParticleColorARGB = pColor.getARGBPackedInt();
         }
