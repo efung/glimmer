@@ -64,7 +64,6 @@ public class GridParticleEmitter extends BaseRectangleParticleEmitter
 
             if (this.mCurrentIndex == this.mIndices.length)
             {
-                shuffleArray(this.mIndices);
                 this.mCurrentIndex = 0;
             }
         }
