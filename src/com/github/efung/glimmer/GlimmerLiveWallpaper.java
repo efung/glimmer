@@ -36,6 +36,7 @@ import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.bitmap.BitmapTextureFormat;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.util.GLState;
 import org.andengine.util.HorizontalAlign;
 import org.andengine.util.color.Color;
 import org.andengine.util.color.ColorUtils;
@@ -72,7 +73,13 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
         this.CAMERA_WIDTH = this.getResources().getDisplayMetrics().widthPixels;
         this.CAMERA_HEIGHT = this.getResources().getDisplayMetrics().heightPixels;
         this.mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-        return new EngineOptions(true, ScreenOrientation.PORTRAIT_FIXED, new FillResolutionPolicy(), this.mCamera);
+        this.mCamera.setResizeOnSurfaceSizeChanged(true);
+
+        if (this.CAMERA_HEIGHT > this.CAMERA_WIDTH) {
+            return new EngineOptions(true, ScreenOrientation.PORTRAIT_FIXED, new FillResolutionPolicy(), this.mCamera);
+        } else {
+            return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new FillResolutionPolicy(), this.mCamera);
+        }
     }
 
     @Override
@@ -99,6 +106,7 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
     public void onCreateScene(OnCreateSceneCallback pOnCreateSceneCallback) throws Exception
     {
         final Scene scene = new Scene();
+        scene.setRotationCenter(CAMERA_WIDTH/2, CAMERA_HEIGHT/2);
         pOnCreateSceneCallback.onCreateSceneFinished(scene);
     }
 
@@ -114,6 +122,18 @@ public class GlimmerLiveWallpaper extends BaseLiveWallpaperService
         super.onPauseGame();
 
         disableSensors();
+    }
+
+    @Override
+    public void onSurfaceChanged(final GLState pGLState, final int pWidth, final int pHeight) {
+        super.onSurfaceChanged(pGLState, pWidth, pHeight);
+
+        if ( (mEngine.getEngineOptions().getScreenOrientation() == ScreenOrientation.PORTRAIT_FIXED && pWidth > pHeight) ||
+            (mEngine.getEngineOptions().getScreenOrientation() == ScreenOrientation.LANDSCAPE_FIXED && pHeight > pWidth)) {
+            mEngine.getScene().setRotation(90f);
+        } else {
+            mEngine.getScene().setRotation(0f);
+        }
     }
 
     @Override
