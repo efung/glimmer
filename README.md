@@ -13,6 +13,9 @@ Or, scan QR code below:
 Release History
 ---------------
 
+**1.1.2** (2013-02-08)
+- Handle device rotation properly
+
 **1.1.1** (2012-12-16)
 - Draw using native resolution instead of stretching to 3:5 aspect ratio. Should look better on tablets.
 - Fix pulsing behaviour
